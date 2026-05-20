@@ -1,0 +1,1 @@
+{"uuid":"43b767cd-9a44-43a2-829c-21330d2eeb69","name":"loginCourierSuccessTest()","children":["b1b1feeb-7f8d-44c3-85de-e38c4512115d"],"befores":[{"name":"setUp","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1779293908803,"stop":1779293908803}],"afters":[],"start":1779293908801,"stop":1779293908950}

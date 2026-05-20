@@ -1,0 +1,1 @@
+{"uuid":"7ca97598-af1b-4eb7-a56a-dea31a7f8323","name":"createCourierReturnCorrectStatusCodeTest()","children":["ef886649-9df7-454b-b2b8-8d6068a640c5"],"befores":[{"name":"setUp","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1779293906496,"stop":1779293906496}],"afters":[],"start":1779293906493,"stop":1779293906959}
