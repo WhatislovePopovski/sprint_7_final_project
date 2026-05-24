@@ -13,13 +13,13 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(AllureJunit5.class)
 public class LoginCourierTest {
     private CourierApi courierApi;
-    private static int testCourierId;
-    private static String testLogin;
-    private static String testPassword;
+    private int testCourierId;
+    private String testLogin;
+    private String testPassword;
 
-    @BeforeAll
-    static void createTestCourier() {
-        CourierApi api = new CourierApi();
+    @BeforeEach
+    void setUp() {
+        courierApi = new CourierApi();
         testLogin = "login_test_" + System.currentTimeMillis();
         testPassword = "password123";
 
@@ -29,16 +29,18 @@ public class LoginCourierTest {
                 .firstName("TestLogin")
                 .build();
 
-        api.createCourier(courier);
-        testCourierId = api.loginCourier(courier)
+        courierApi.createCourier(courier);
+        testCourierId = courierApi.loginCourier(courier)
                 .then()
                 .extract()
                 .path("id");
     }
 
-    @BeforeEach
-    void setUp() {
-        courierApi = new CourierApi();
+    @AfterEach
+    void cleanup() {
+        if (testCourierId > 0) {
+            courierApi.deleteCourier(testCourierId);
+        }
     }
 
     @Test
@@ -121,11 +123,5 @@ public class LoginCourierTest {
         courierApi.loginCourier(courier)
                 .then()
                 .body("id", is(testCourierId));
-    }
-
-    @AfterAll
-    static void cleanup() {
-        CourierApi api = new CourierApi();
-        api.deleteCourier(testCourierId);
     }
 }

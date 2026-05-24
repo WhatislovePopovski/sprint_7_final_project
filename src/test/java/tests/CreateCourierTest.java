@@ -10,23 +10,33 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.hamcrest.Matchers.*;
 
 @ExtendWith(AllureJunit5.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CreateCourierTest {
     private CourierApi courierApi;
-    private static int createdCourierId;
+    private int createdCourierId;
+    private String createdLogin;
+    private String createdPassword;
 
     @BeforeEach
     void setUp() {
         courierApi = new CourierApi();
     }
 
+    @AfterEach
+    void cleanup() {
+        if (createdCourierId > 0) {
+            courierApi.deleteCourier(createdCourierId);
+        }
+    }
+
     @Test
-    @Order(1)
     @Description("Проверка: курьера можно создать")
     void createCourierSuccessTest() {
+        createdLogin = "test_courier_" + System.currentTimeMillis();
+        createdPassword = "password123";
+
         Courier courier = Courier.builder()
-                .login("test_courier_" + System.currentTimeMillis())
-                .password("password123")
+                .login(createdLogin)
+                .password(createdPassword)
                 .firstName("TestName")
                 .build();
 
@@ -43,29 +53,26 @@ public class CreateCourierTest {
     }
 
     @Test
-    @Order(2)
     @Description("Проверка: нельзя создать двух одинаковых курьеров")
     void createDuplicateCourierTest() {
         String uniqueLogin = "duplicate_" + System.currentTimeMillis();
+        String uniquePassword = "password123";
+
         Courier courier = Courier.builder()
                 .login(uniqueLogin)
-                .password("password123")
+                .password(uniquePassword)
                 .firstName("TestName")
                 .build();
 
-        // Создаем первого курьера
         courierApi.createCourier(courier)
                 .then()
                 .statusCode(201);
 
-        // Пытаемся создать такого же
         courierApi.createCourier(courier)
                 .then()
                 .statusCode(409)
-                .body("message", equalTo("Этот логин уже используется. Попробуйте другой." +
-                        ""));
+                .body("message", equalTo("Этот логин уже используется. Попробуйте другой."));
 
-        // Получаем id для удаления
         int courierId = courierApi.loginCourier(courier)
                 .then()
                 .extract()
@@ -74,7 +81,6 @@ public class CreateCourierTest {
     }
 
     @Test
-    @Order(3)
     @Description("Проверка: для создания курьера нужны все обязательные поля")
     void createCourierWithoutLoginTest() {
         Courier courier = Courier.builder()
@@ -89,12 +95,14 @@ public class CreateCourierTest {
     }
 
     @Test
-    @Order(4)
     @Description("Проверка: запрос возвращает правильный код ответа при успешном создании")
     void createCourierReturnCorrectStatusCodeTest() {
+        String login = "status_test_" + System.currentTimeMillis();
+        String password = "password123";
+
         Courier courier = Courier.builder()
-                .login("status_test_" + System.currentTimeMillis())
-                .password("password123")
+                .login(login)
+                .password(password)
                 .firstName("TestName")
                 .build();
 
@@ -110,12 +118,14 @@ public class CreateCourierTest {
     }
 
     @Test
-    @Order(5)
     @Description("Проверка: успешный запрос возвращает ok: true")
     void createCourierReturnsOkTrueTest() {
+        String login = "ok_test_" + System.currentTimeMillis();
+        String password = "password123";
+
         Courier courier = Courier.builder()
-                .login("ok_test_" + System.currentTimeMillis())
-                .password("password123")
+                .login(login)
+                .password(password)
                 .firstName("TestName")
                 .build();
 
@@ -128,13 +138,5 @@ public class CreateCourierTest {
                 .extract()
                 .path("id");
         courierApi.deleteCourier(courierId);
-    }
-
-    @AfterAll
-    static void cleanup() {
-        if (createdCourierId > 0) {
-            CourierApi api = new CourierApi();
-            api.deleteCourier(createdCourierId);
-        }
     }
 }
